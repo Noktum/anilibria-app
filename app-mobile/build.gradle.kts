@@ -38,14 +38,17 @@ android {
     }
 
     val localProperties = Properties().apply {
-        load(FileInputStream(rootProject.file("local.properties")))
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            FileInputStream(localPropertiesFile).use { load(it) }
+        }
     }
     signingConfigs {
         create("release") {
-            storeFile = file(localProperties.getProperty("storeFile"))
-            storePassword = localProperties.getProperty("storePassword")
-            keyAlias = localProperties.getProperty("keyAlias")
-            keyPassword = localProperties.getProperty("keyPassword")
+            localProperties.getProperty("storeFile")?.let { storeFile = file(it) }
+            localProperties.getProperty("storePassword")?.let { storePassword = it }
+            localProperties.getProperty("keyAlias")?.let { keyAlias = it }
+            localProperties.getProperty("keyPassword")?.let { keyPassword = it }
         }
     }
 
@@ -135,7 +138,10 @@ kotlin {
 
 appmetrica {
     val localProperties = Properties().apply {
-        load(FileInputStream(rootProject.file("local.properties")))
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            FileInputStream(localPropertiesFile).use { load(it) }
+        }
     }
     val propApiKey = localProperties.getProperty("appmetrica_post_api_key", "")
     setPostApiKey(propApiKey)
